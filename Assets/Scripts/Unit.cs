@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour
 {
-    public Transform target;
-    public float speed = 20;
-    Vector3[] path;
-    int targetindex;
+    public Transform target;    // where are we trying to reach
+    public float speed = 20;    // movement speed
+    Vector3[] path;             // the path of points to follow
+    int targetindex;            // how far along the path are we
 
     private void Start()
     {
@@ -24,6 +24,7 @@ public class Unit : MonoBehaviour
         }
     }
 
+    // follow the path point by point
     IEnumerator FollowPath()
     {
         Vector3 currentWaypoint = path[0];
@@ -43,6 +44,7 @@ public class Unit : MonoBehaviour
         }
     }
 
+    // draw black cubes and lines along the path
     public void OnDrawGizmos()
     {
         if(path != null)
