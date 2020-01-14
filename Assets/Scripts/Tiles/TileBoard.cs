@@ -11,9 +11,11 @@ public class TileBoard : MonoBehaviour
     public Tilemap tilemap;                     // the tile map
     public bool toggleValueHighlighting = true; // toggle for highlighting the walkable and non-walkable tiles
 
-    private int[] values;                       // 0 = walkable, 1 = non-walkable
+    private bool[] walkables;                       // 0 = walkable, 1 = non-walkable
+    private int[] terrainPenalties;
     private Sprite[] tilemapSprites;            // get all of the sprites we're using - this is only to hardcode the walkable values
     private int[] notWalkableIndices = new int[] { 3, 4, 5, 12, 13, 14, 22, 23, 24, 28, 29, 30, 31, 35, 40, 44, 47, 48, 51, 52, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68 }; // hardcoded for ease
+    private int[] difficultTerrain = new int[] { 8, 9, 17, 18, 25, 26, 27, 32, 33, 34, 41, 42, 43};
 
     TileNode[,] nodes;  // 2D array of all of the grids
     int offsetX;        // index X offset because our bottom left corner might not be at position (0, 0, 0)
@@ -26,12 +28,24 @@ public class TileBoard : MonoBehaviour
     private void Awake()
     {
         tilemapSprites = Resources.LoadAll<Sprite>("TilesetExample");
-        values = new int[tilemapSprites.Length];
+        walkables = new bool[tilemapSprites.Length];
+        terrainPenalties = new int[tilemapSprites.Length];
 
-        // hardcode the values array for now
+        // hardcode the walkable array for now
+        for (int i = 0; i < walkables.Length; i++)
+        {
+            walkables[i] = true;
+        }
+
         for (int i = 0; i < notWalkableIndices.Length; i++)
         {
-            values[notWalkableIndices[i]] = 1;
+            walkables[notWalkableIndices[i]] = false;
+        }
+
+        // hardcode the terrain penalties array as well
+        for(int i = 0; i < difficultTerrain.Length; i++)
+        {
+            terrainPenalties[difficultTerrain[i]] = 5;
         }
 
         CreateGrid();
@@ -96,9 +110,10 @@ public class TileBoard : MonoBehaviour
                 baseTile,
                 tilemap,
                 pos.x + ", " + pos.y,
-                values[code],
+                walkables[code],
                 aGridX,
-                aGridy);
+                aGridy,
+                terrainPenalties[code]);
 
             nodes[aGridX, aGridy] = tile; // add the tile
         }
@@ -175,9 +190,9 @@ public class TileBoard : MonoBehaviour
                 if (toggleValueHighlighting)
                 {
 
-                    if (n.value == 0) // walkable
+                    if (n.walkable) // walkable
                         n.tilemapMember.SetColor(n.localPosition, Color.green);
-                    else if (n.value == 1) // not walkable
+                    else if (!n.walkable) // not walkable
                         n.tilemapMember.SetColor(n.localPosition, Color.red);
                 }
                 else

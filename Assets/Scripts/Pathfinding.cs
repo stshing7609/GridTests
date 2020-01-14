@@ -52,7 +52,7 @@ public class Pathfinding : MonoBehaviour
         TileNode targetNode = grid.NodeFromWorldPosition(end);
 
         // only pathfind if both the start and end are walkable
-        if (startNode.value == 0 && targetNode.value == 0)
+        if (startNode.walkable && targetNode.walkable)
         {
             //List<TileNode> openSet = new List<TileNode>(); // what nodes are available to check
             Heap<TileNode> openSet = new Heap<TileNode>(grid.MaxSize); // use a Binary Heap instead of List so that we only compare to parent rather than iterate everything
@@ -87,11 +87,11 @@ public class Pathfinding : MonoBehaviour
                 foreach (TileNode neighbor in grid.GetNeighbors(currentNode))
                 {
                     // if the neighbor is not walkable (value of 1) or it's in the closed set, don't check it
-                    if (neighbor.value == 1 || closedSet.Contains(neighbor))
+                    if (!neighbor.walkable || closedSet.Contains(neighbor))
                         continue;
 
                     // get path from the current node to the neighbor - NOTE: We'd add weight considerations here
-                    int newMovementCostToNeighbor = currentNode.gCost + GetDistance(currentNode, neighbor); // add the current node's gCost to find out how far it is from the start in total
+                    int newMovementCostToNeighbor = currentNode.gCost + GetDistance(currentNode, neighbor) + neighbor.movementPenalty; // add the current node's gCost to find out how far it is from the start in total
                     // if the new path to the neighbor is shorter or the the neighbor isn't in the open set yet
                     if (newMovementCostToNeighbor < neighbor.gCost || !openSet.Contains(neighbor))
                     {
@@ -112,8 +112,11 @@ public class Pathfinding : MonoBehaviour
 
         yield return null; // wait a frame then try again
         // if we found a path, set the waypoints to the retrace
-        if(pathSuccess)
+        if (pathSuccess)
+        {
             waypoints = RetracePath(startNode, targetNode);
+            pathSuccess = waypoints.Length > 0; // in case we move the target
+        }
         requestManager.FinishedProcessPath(waypoints, pathSuccess); // give the requestmanager the data
     }
 

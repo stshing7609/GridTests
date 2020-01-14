@@ -12,7 +12,8 @@ public class TileNode : IHeapItem<TileNode>
     public int aGridX;                  // x position in the array grid
     public int aGridY;                  
     public string name;                 // name of the node
-    public int value;                   // numerical data: 0 = walkable, 1 = not walkable
+    public bool walkable;
+    public int movementPenalty;                  // 
 
     // for pathfinding
     public int gCost;                   // distance from the start point
@@ -20,16 +21,17 @@ public class TileNode : IHeapItem<TileNode>
     public TileNode parent;             // the node we was used to get to this node - allows us to retrace the path
     int heapIndex;
 
-    public TileNode(Vector3Int _localPosition, Vector3 _worldPosition, TileBase _tileBase, Tilemap _tilemapMember, string _name, int _value, int _aGridX, int _aGridY)
+    public TileNode(Vector3Int _localPosition, Vector3 _worldPosition, TileBase _tileBase, Tilemap _tilemapMember, string _name, bool _walkable, int _aGridX, int _aGridY, int _penalty)
     {
         localPosition = _localPosition;
         worldPosition = _worldPosition + new Vector3(0.5f, 0.5f, 0);
         tileBase = _tileBase;
         tilemapMember = _tilemapMember;
         name = _name;
-        value = _value;
+        walkable = _walkable;
         aGridX = _aGridX;
         aGridY = _aGridY;
+        movementPenalty = _penalty;
     }
 
     // total cost to enter the node when using A*: is always gCost + hCost
