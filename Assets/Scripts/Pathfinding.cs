@@ -90,7 +90,7 @@ public class Pathfinding : MonoBehaviour
                     if (!neighbor.walkable || closedSet.Contains(neighbor))
                         continue;
 
-                    // get path from the current node to the neighbor - NOTE: We'd add weight considerations here
+                    // get path from the current node to the neighbor. Also add weight value here
                     int newMovementCostToNeighbor = currentNode.gCost + GetDistance(currentNode, neighbor) + neighbor.movementPenalty; // add the current node's gCost to find out how far it is from the start in total
                     // if the new path to the neighbor is shorter or the the neighbor isn't in the open set yet
                     if (newMovementCostToNeighbor < neighbor.gCost || !openSet.Contains(neighbor))
@@ -131,6 +131,10 @@ public class Pathfinding : MonoBehaviour
             path.Add(currentNode);
             currentNode = currentNode.parent;
         }
+
+        // add the start node to the path to ensure we are restricted to 4-directional movement
+        // in other wods, the SimplifyPath method will be forced to check the start position against the first movement in the path
+        path.Add(startNode);
 
         Vector3[] waypoints = SimplifyPath(path); // simplify the path and put it in a Vector3[] that will be the path's waypoints
         // reverse the path because we traversed it backwards

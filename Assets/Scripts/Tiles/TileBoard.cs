@@ -191,7 +191,12 @@ public class TileBoard : MonoBehaviour
                 {
 
                     if (n.walkable) // walkable
-                        n.tilemapMember.SetColor(n.localPosition, Color.green);
+                    {
+                        if(n.movementPenalty == 0)
+                            n.tilemapMember.SetColor(n.localPosition, Color.green);
+                        else
+                            n.tilemapMember.SetColor(n.localPosition, Color.yellow);
+                    }
                     else if (!n.walkable) // not walkable
                         n.tilemapMember.SetColor(n.localPosition, Color.red);
                 }
